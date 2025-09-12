@@ -2,13 +2,6 @@ import React, { createRef } from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
 import igv from 'igv';
 
-// const igvStyle = {
-//   paddingTop: '10px',
-//   paddingBottom: '10px',
-//   margin: '8px',
-//   border: '1px solid lightgray'
-// };
-
 /**
  * React component for IGV.
  *
@@ -28,12 +21,7 @@ class IGV extends React.Component {
   }
 
   render() {
-    return (
-      <div
-        ref={this.container}
-        // style={igvStyle}
-      ></div>
-    );
+    return <div ref={this.container}></div>;
   }
 }
 
@@ -41,9 +29,6 @@ class IGV extends React.Component {
  * A Lumino Widget that wraps an IGVComponent.
  */
 export class IGVWidget extends ReactWidget {
-  /**
-   * Constructs a new IGVWidget.
-   */
   constructor() {
     super();
     this.addClass('jp-react-widget');
