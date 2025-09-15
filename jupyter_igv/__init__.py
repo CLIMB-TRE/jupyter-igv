@@ -5,7 +5,7 @@ except ImportError:
     # in editable mode with pip. It is highly recommended to install
     # the package from a stable release or in editable mode: https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs
     import warnings
-    warnings.warn("Importing 'jlab_igv' outside a proper installation.")
+    warnings.warn("Importing 'jupyter_igv' outside a proper installation.")
     __version__ = "dev"
 from .handlers import setup_handlers
 
@@ -13,13 +13,13 @@ from .handlers import setup_handlers
 def _jupyter_labextension_paths():
     return [{
         "src": "labextension",
-        "dest": "jlab-igv"
+        "dest": "jupyter-igv"
     }]
 
 
 def _jupyter_server_extension_points():
     return [{
-        "module": "jlab_igv"
+        "module": "jupyter_igv"
     }]
 
 
@@ -32,5 +32,5 @@ def _load_jupyter_server_extension(server_app):
         JupyterLab application instance
     """
     setup_handlers(server_app.web_app)
-    name = "jlab_igv"
+    name = "jupyter_igv"
     server_app.log.info(f"Registered {name} server extension")

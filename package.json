@@ -1,5 +1,5 @@
 {
-    "name": "jlab-igv",
+    "name": "jupyter-igv",
     "version": "0.1.0",
     "description": "JupyterLab extension for IGV",
     "keywords": [
@@ -12,9 +12,9 @@
         "jupyterlab",
         "jupyterlab-extension"
     ],
-    "homepage": "https://github.com/tombch/jlab-igv",
+    "homepage": "https://github.com/tombch/jupyter-igv",
     "bugs": {
-        "url": "https://github.com/tombch/jlab-igv/issues"
+        "url": "https://github.com/tombch/jupyter-igv/issues"
     },
     "license": "MIT",
     "author": "University of Birmingham",
@@ -34,7 +34,7 @@
     "style": "style/index.css",
     "repository": {
         "type": "git",
-        "url": "https://github.com/tombch/jlab-igv.git"
+        "url": "https://github.com/tombch/jupyter-igv.git"
     },
     "scripts": {
         "build": "jlpm build:lib && jlpm build:labextension:dev",
@@ -46,7 +46,7 @@
         "clean": "jlpm clean:lib",
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
         "clean:lintcache": "rimraf .eslintcache .stylelintcache",
-        "clean:labextension": "rimraf jlab_igv/labextension jlab_igv/_version.py",
+        "clean:labextension": "rimraf jupyter_igv/labextension jupyter_igv/_version.py",
         "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
         "eslint": "jlpm eslint:check --fix",
         "eslint:check": "eslint . --cache --ext .ts,.tsx",
@@ -115,12 +115,12 @@
                     "pip"
                 ],
                 "base": {
-                    "name": "jlab_igv"
+                    "name": "jupyter_igv"
                 }
             }
         },
         "extension": true,
-        "outputDir": "jlab_igv/labextension"
+        "outputDir": "jupyter_igv/labextension"
     },
     "eslintIgnore": [
         "node_modules",

@@ -1,7 +1,7 @@
 {
   "ServerApp": {
     "jpserver_extensions": {
-      "jlab_igv": true
+      "jupyter_igv": true
     }
   }
 }

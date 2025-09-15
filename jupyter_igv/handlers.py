@@ -138,18 +138,18 @@ def setup_handlers(web_app):
     host_pattern = ".*$"
     base_url = web_app.settings["base_url"]
 
-    route_pattern = url_path_join(base_url, "jlab-igv", "s3")
+    route_pattern = url_path_join(base_url, "jupyter-igv", "s3")
     handlers = [(route_pattern, S3ViewHandler)]
     web_app.add_handlers(host_pattern, handlers)
 
-    route_pattern = url_path_join(base_url, "jlab-igv", "reroute")
+    route_pattern = url_path_join(base_url, "jupyter-igv", "reroute")
     handlers = [(route_pattern, RedirectingRouteHandler)]
     web_app.add_handlers(host_pattern, handlers)
 
-    route_pattern = url_path_join(base_url, "jlab-igv", "version")
+    route_pattern = url_path_join(base_url, "jupyter-igv", "version")
     handlers = [(route_pattern, VersionHandler)]
     web_app.add_handlers(host_pattern, handlers)
 
-    route_pattern = url_path_join(base_url, "jlab-igv", "file-write")
+    route_pattern = url_path_join(base_url, "jupyter-igv", "file-write")
     handlers = [(route_pattern, FileWriteHandler)]
     web_app.add_handlers(host_pattern, handlers)

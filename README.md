@@ -1,3 +1,3 @@
-# jlab-igv
+# jupyter-igv
 
 JupyterLab Extension for IGV

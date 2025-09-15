@@ -8,17 +8,17 @@ import { IGVWidget } from './widget';
 import { igvIcon } from './icon';
 
 /**
- * The command IDs used by the jlab-igv plugin.
+ * The command IDs used by the jupyter-igv plugin.
  */
 namespace CommandIDs {
-  export const create = 'create-jlab-igv';
+  export const create = 'create-jupyter-igv';
 }
 
 /**
- * Initialization data for the jlab-igv extension.
+ * Initialization data for the jupyter-igv extension.
  */
 const extension: JupyterFrontEndPlugin<void> = {
-  id: 'jlab-igv',
+  id: 'jupyter-igv',
   description: 'JupyterLab Extension for IGV (Integrative Genomics Viewer).',
   autoStart: true,
   optional: [ILauncher],

@@ -1,5 +1,5 @@
 {
   "packageManager": "python",
-  "packageName": "jlab_igv",
-  "uninstallInstructions": "Use your Python package manager (pip, conda, etc.) to uninstall the package jlab_igv"
+  "packageName": "jupyter_igv",
+  "uninstallInstructions": "Use your Python package manager (pip, conda, etc.) to uninstall the package jupyter_igv"
 }
