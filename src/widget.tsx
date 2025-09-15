@@ -29,10 +29,13 @@ class IGV extends React.Component {
  * A Lumino Widget that wraps an IGVComponent.
  */
 export class IGVWidget extends ReactWidget {
-  constructor() {
+  constructor(name: string) {
     super();
-    this.addClass('jp-react-widget');
+    this.addClass('igv-widget');
+    this.name = name;
   }
+
+  name: string;
 
   render(): JSX.Element {
     return <IGV />;
