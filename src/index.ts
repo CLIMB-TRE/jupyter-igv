@@ -5,6 +5,7 @@ import {
 import { MainAreaWidget } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
 import { IGVWidget } from './widget';
+import { igvIcon } from './icon';
 
 /**
  * The command IDs used by the jlab-igv plugin.
@@ -18,7 +19,7 @@ namespace CommandIDs {
  */
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'jlab-igv',
-  description: 'JupyterLab Extension for IGV.',
+  description: 'JupyterLab Extension for IGV (Integrative Genomics Viewer).',
   autoStart: true,
   optional: [ILauncher],
   activate: (app: JupyterFrontEnd, launcher: ILauncher) => {
@@ -26,12 +27,14 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     const command = CommandIDs.create;
     commands.addCommand(command, {
-      caption: 'Create a new IGV widget.',
+      caption: 'IGV | Integrative Genomics Viewer',
       label: 'IGV',
+      icon: igvIcon,
       execute: () => {
         const content = new IGVWidget();
         const widget = new MainAreaWidget<IGVWidget>({ content });
         widget.title.label = 'IGV';
+        widget.title.icon = igvIcon;
         app.shell.add(widget, 'main');
       }
     });
