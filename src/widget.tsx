@@ -73,36 +73,37 @@ function IGViewer({ igvOptions }: { igvOptions: IGVOptions }) {
 }
 
 function IGV() {
+  const defaultOptions: IGVOptions = {
+    genome: 'hg38'
+  };
+
   // Genome property
-  const [genome, setGenome] = useState('hg38');
+  const [genome, setGenome] = useState('');
 
   // Reference properties
   const [fastaURL, setFastaURL] = useState('');
   const [indexURL, setIndexURL] = useState('');
 
   // IGV options state
-  const [igvOptions, setIgvOptions] = useState<IGVOptions>({
-    genome: genome
-  });
+  const [igvOptions, setIgvOptions] = useState<IGVOptions>(defaultOptions);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    const options: IGVOptions = {};
+    const updatedOptions: IGVOptions = {};
 
     if (genome) {
-      options.genome = genome;
+      updatedOptions.genome = genome;
     }
 
     if (fastaURL) {
-      options.reference = {
+      updatedOptions.reference = {
         fastaURL: fastaURL,
         indexURL: indexURL
       };
     }
 
-    console.log('Setting IGV options:', options);
-
-    setIgvOptions(options);
+    console.log('Setting IGV options:', updatedOptions);
+    setIgvOptions(updatedOptions);
   };
 
   return (
