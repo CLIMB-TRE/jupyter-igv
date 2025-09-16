@@ -1,10 +1,50 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
-import igv from 'igv';
+import igv, { GenomeDef, ReferenceGenome } from 'igv';
 
-type IGVOptionsProps = {
-  genome: string;
-  locus?: string;
+const genomeOptions = [
+  '',
+  'hs1',
+  'chm13v1.1',
+  'hg38',
+  'hg38_1kg',
+  'hg19',
+  'hg18',
+  'mm39',
+  'mm10',
+  'mm9',
+  'rn7',
+  'rn6',
+  'gorGor6',
+  'gorGor4',
+  'panTro6',
+  'panTro5',
+  'panTro4',
+  'macFas5',
+  'GCA_011100615.1',
+  'panPan2',
+  'canFam3',
+  'canFam4',
+  'canFam5',
+  'bosTau9',
+  'bosTau8',
+  'susScr11',
+  'galGal6',
+  'danRer11',
+  'danRer10',
+  'ce11',
+  'dm6',
+  'dm3',
+  'dmel_r5.9',
+  'sacCer3',
+  'ASM294v2',
+  'ASM985889v3',
+  'tair10'
+];
+
+type IGVOptions = {
+  genome?: GenomeDef;
+  reference?: ReferenceGenome;
 };
 
 /**
@@ -12,63 +52,84 @@ type IGVOptionsProps = {
  *
  * @returns The React component
  */
-function IGViewer(props: IGVOptionsProps) {
+function IGViewer({ igvOptions }: { igvOptions: IGVOptions }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const browserRef = useRef<any>(null);
 
   useEffect(() => {
-    const igvOptions = { genome: 'hg38', locus: 'BRCA1' };
     igv
-      .createBrowser(containerRef.current!, igvOptions)
+      .createBrowser(containerRef.current!, igvOptions as any)
       .then(browser => (browserRef.current = browser));
   }, []);
 
   useEffect(() => {
     if (browserRef.current) {
-      if (props.genome) {
-        browserRef.current.loadGenome(props.genome);
-      }
-
-      if (props.locus) {
-        browserRef.current.search(props.locus);
-      }
+      console.log('Loading IGV options:', igvOptions);
+      browserRef.current.loadGenome(igvOptions);
     }
-  }, [props.genome, props.locus]);
+  }, [igvOptions]);
 
   return <div ref={containerRef} />;
 }
 
 function IGV() {
-  const [genome, setGenome] = useState('');
-  const [locus, setLocus] = useState('');
-  const [igvOptions, setIgvOptions] = useState<IGVOptionsProps>({
-    genome,
-    locus
+  // Genome property
+  const [genome, setGenome] = useState('hg38');
+
+  // Reference properties
+  const [fastaURL, setFastaURL] = useState('');
+  const [indexURL, setIndexURL] = useState('');
+
+  // IGV options state
+  const [igvOptions, setIgvOptions] = useState<IGVOptions>({
+    genome: genome
   });
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    setIgvOptions({ genome, locus });
+    const options: IGVOptions = {};
+
+    if (genome) {
+      options.genome = genome;
+    }
+
+    if (fastaURL) {
+      options.reference = {
+        fastaURL: fastaURL,
+        indexURL: indexURL
+      };
+    }
+
+    console.log('Setting IGV options:', options);
+
+    setIgvOptions(options);
   };
 
   return (
     <div>
       <form onSubmit={handleSubmit} style={{ marginBottom: '8px' }}>
+        <select value={genome} onChange={e => setGenome(e.target.value)}>
+          {genomeOptions.map(opt => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
         <input
           type="text"
-          value={genome}
-          onChange={e => setGenome(e.target.value)}
-          placeholder="Enter genome (e.g., hg38)"
+          value={fastaURL}
+          onChange={e => setFastaURL(e.target.value)}
+          placeholder="Reference FASTA (.fa or .fasta)"
         />
         <input
           type="text"
-          value={locus}
-          onChange={e => setLocus(e.target.value)}
-          placeholder="Enter locus (e.g., BRCA1)"
+          value={indexURL}
+          onChange={e => setIndexURL(e.target.value)}
+          placeholder="Reference FASTA index (.fai)"
         />
-        <button type="submit">Go</button>
+        <button type="submit">Refresh</button>
       </form>
-      <IGViewer {...igvOptions} />
+      <IGViewer igvOptions={igvOptions} />
     </div>
   );
 }
