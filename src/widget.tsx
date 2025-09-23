@@ -73,7 +73,10 @@ function IGViewer({ igvOptions }: { igvOptions: IGVOptions }) {
 }
 
 function IGV() {
+  const baseOptions: IGVOptions = {};
+
   const defaultOptions: IGVOptions = {
+    ...baseOptions,
     genome: 'hg38'
   };
 
@@ -89,7 +92,9 @@ function IGV() {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    const updatedOptions: IGVOptions = {};
+    const updatedOptions: IGVOptions = {
+      ...baseOptions
+    };
 
     if (genome) {
       updatedOptions.genome = genome;
