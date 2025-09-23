@@ -1,159 +1,39 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
-import igv, { GenomeDef, ReferenceGenome } from 'igv';
+import JupyterIGV from 'jupyter-igv-component';
 
-const genomeOptions = [
-  '',
-  'hs1',
-  'chm13v1.1',
-  'hg38',
-  'hg38_1kg',
-  'hg19',
-  'hg18',
-  'mm39',
-  'mm10',
-  'mm9',
-  'rn7',
-  'rn6',
-  'gorGor6',
-  'gorGor4',
-  'panTro6',
-  'panTro5',
-  'panTro4',
-  'macFas5',
-  'GCA_011100615.1',
-  'panPan2',
-  'canFam3',
-  'canFam4',
-  'canFam5',
-  'bosTau9',
-  'bosTau8',
-  'susScr11',
-  'galGal6',
-  'danRer11',
-  'danRer10',
-  'ce11',
-  'dm6',
-  'dm3',
-  'dmel_r5.9',
-  'sacCer3',
-  'ASM294v2',
-  'ASM985889v3',
-  'tair10'
-];
-
-type IGVOptions = {
-  genome?: GenomeDef;
-  reference?: ReferenceGenome;
-};
-
-/**
- * React component for IGV.
- *
- * @returns The React component
- */
-function IGViewer({ igvOptions }: { igvOptions: IGVOptions }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const browserRef = useRef<any>(null);
-
-  useEffect(() => {
-    igv
-      .createBrowser(containerRef.current!, igvOptions as any)
-      .then(browser => (browserRef.current = browser));
-  }, []);
-
-  useEffect(() => {
-    if (browserRef.current) {
-      console.log('Loading IGV options:', igvOptions);
-      browserRef.current.loadGenome(igvOptions);
-    }
-  }, [igvOptions]);
-
-  return <div ref={containerRef} />;
-}
-
-function IGV() {
-  const baseOptions: IGVOptions = {};
-
-  const defaultOptions: IGVOptions = {
-    ...baseOptions,
-    genome: 'hg38'
-  };
-
-  // Genome property
-  const [genome, setGenome] = useState('');
-
-  // Reference properties
-  const [fastaURL, setFastaURL] = useState('');
-  const [indexURL, setIndexURL] = useState('');
-
-  // IGV options state
-  const [igvOptions, setIgvOptions] = useState<IGVOptions>(defaultOptions);
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    const updatedOptions: IGVOptions = {
-      ...baseOptions
-    };
-
-    if (genome) {
-      updatedOptions.genome = genome;
-    }
-
-    if (fastaURL) {
-      updatedOptions.reference = {
-        fastaURL: fastaURL,
-        indexURL: indexURL
-      };
-    }
-
-    console.log('Setting IGV options:', updatedOptions);
-    setIgvOptions(updatedOptions);
-  };
-
-  return (
-    <div>
-      <form onSubmit={handleSubmit} style={{ marginBottom: '8px' }}>
-        <select value={genome} onChange={e => setGenome(e.target.value)}>
-          {genomeOptions.map(opt => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          value={fastaURL}
-          onChange={e => setFastaURL(e.target.value)}
-          placeholder="Reference FASTA (.fa or .fasta)"
-        />
-        <input
-          type="text"
-          value={indexURL}
-          onChange={e => setIndexURL(e.target.value)}
-          placeholder="Reference FASTA index (.fai)"
-        />
-        <button type="submit">Refresh</button>
-      </form>
-      <IGViewer igvOptions={igvOptions} />
-    </div>
-  );
-}
-
-/**
- * A Lumino Widget that wraps an IGVComponent.
- */
 export class IGVWidget extends ReactWidget {
-  constructor(name: string) {
+  constructor(
+    httpPathHandler: (route: string) => Promise<Response>,
+    s3PathHandler: (path: string) => Promise<void>,
+    fileWriter: (path: string, content: string) => Promise<void>,
+    version: string,
+    name: string
+  ) {
     super();
     this.addClass('igv-widget');
+    this.httpPathHandler = httpPathHandler;
+    this.s3PathHandler = s3PathHandler;
+    this.fileWriter = fileWriter;
+    this.version = version;
     this.name = name;
   }
 
+  httpPathHandler: (route: string) => Promise<Response>;
+  s3PathHandler: (path: string) => Promise<void>;
+  fileWriter: (path: string, content: string) => Promise<void>;
+  version: string;
   name: string;
 
   render(): JSX.Element {
-    return <IGV />;
+    return (
+      <JupyterIGV
+        httpPathHandler={this.httpPathHandler}
+        s3PathHandler={this.s3PathHandler}
+        fileWriter={this.fileWriter}
+        extVersion={this.version}
+      />
+    );
   }
 }
 

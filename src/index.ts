@@ -8,7 +8,9 @@ import {
   MainAreaWidget,
   WidgetTracker
 } from '@jupyterlab/apputils';
+import { IDocumentManager } from '@jupyterlab/docmanager';
 import { ILauncher } from '@jupyterlab/launcher';
+import { requestAPI, requestAPIResponse } from './handler';
 import { IGVWidget } from './widget';
 import { igvIcon } from './icon';
 
@@ -26,11 +28,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: PLUGIN_ID,
   description: 'JupyterLab Extension for IGV (Integrative Genomics Viewer).',
   autoStart: true,
-  requires: [ICommandPalette],
+  requires: [ICommandPalette, IDocumentManager],
   optional: [ILauncher, ILayoutRestorer],
   activate: (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
+    documentManager: IDocumentManager,
     launcher: ILauncher | null,
     restorer: ILayoutRestorer | null
   ) => {
@@ -39,6 +42,48 @@ const plugin: JupyterFrontEndPlugin<void> = {
     // Define command IDs and categories
     const igvCommandID = 'jupyter_igv:open';
     const category = 'CLIMB-TRE';
+
+    // Retrieve extension version and log to the console
+    let version = '';
+    requestAPI<any>('version')
+      .then(data => {
+        version = data['version'];
+        console.log(
+          `JupyterLab extension ${PLUGIN_NAMESPACE} version: ${version}`
+        );
+      })
+      .catch(error =>
+        console.error(`Failed to fetch ${PLUGIN_NAMESPACE} version: ${error}`)
+      );
+
+    // Handler for rerouting requests to the Onyx API
+    const httpPathHandler = async (route: string): Promise<Response> => {
+      return requestAPIResponse('reroute', {}, ['route', route]);
+    };
+
+    // Handler for opening S3 documents
+    const s3PathHandler = async (uri: string): Promise<void> => {
+      return requestAPI<any>('s3', {}, ['uri', uri]).then(data => {
+        documentManager.open(data['path']);
+      });
+    };
+
+    // Handler for writing files
+    const fileWriteHandler = async (
+      path: string,
+      content: string
+    ): Promise<void> => {
+      return requestAPI<any>(
+        'file-write',
+        {
+          body: JSON.stringify({ content: content }),
+          method: 'POST'
+        },
+        ['path', path]
+      ).then(data => {
+        documentManager.open(data['path']);
+      });
+    };
 
     // Handle layout restoration
     if (restorer) {
@@ -59,7 +104,13 @@ const plugin: JupyterFrontEndPlugin<void> = {
       }
 
       // Create the IGVWidget instance
-      const content = new IGVWidget(name);
+      const content = new IGVWidget(
+        httpPathHandler,
+        s3PathHandler,
+        fileWriteHandler,
+        version,
+        name
+      );
 
       // Define the MainAreaWidget with the IGVWidget content
       const widget = new MainAreaWidget({ content });
