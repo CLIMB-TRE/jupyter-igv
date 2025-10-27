@@ -56,35 +56,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
         console.error(`Failed to fetch ${PLUGIN_NAMESPACE} version: ${error}`)
       );
 
-    // Handler for rerouting requests to the Onyx API
-    const httpPathHandler = async (route: string): Promise<Response> => {
-      return requestAPIResponse('reroute', {}, ['route', route]);
-    };
-
-    // Handler for opening S3 documents
-    const s3PathHandler = async (uri: string): Promise<void> => {
-      return requestAPI<any>('s3', {}, ['uri', uri]).then(data => {
-        documentManager.open(data['path']);
-      });
-    };
-
-    // Handler for writing files
-    const fileWriteHandler = async (
-      path: string,
-      content: string
-    ): Promise<void> => {
-      return requestAPI<any>(
-        'file-write',
-        {
-          body: JSON.stringify({ content: content }),
-          method: 'POST'
-        },
-        ['path', path]
-      ).then(data => {
-        documentManager.open(data['path']);
-      });
-    };
-
     // Handle layout restoration
     if (restorer) {
       void restorer.restore(tracker, {
@@ -105,9 +76,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
       // Create the IGVWidget instance
       const content = new IGVWidget(
-        httpPathHandler,
-        s3PathHandler,
-        fileWriteHandler,
+        route => Promise.resolve(requestAPIResponse(route)),
+        _ => Promise.resolve(),
+        _ => Promise.resolve(),
         version,
         name
       );
