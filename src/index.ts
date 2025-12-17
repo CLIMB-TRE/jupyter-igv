@@ -8,6 +8,7 @@ import {
   MainAreaWidget,
   WidgetTracker
 } from '@jupyterlab/apputils';
+import { IStateDB } from '@jupyterlab/statedb';
 import { ILauncher } from '@jupyterlab/launcher';
 import { requestAPI } from './handler';
 import { JupyterIGVWidget } from './widget';
@@ -32,11 +33,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: PLUGIN_ID,
   description: 'JupyterLab Extension for IGV (Integrative Genomics Viewer).',
   autoStart: true,
-  requires: [ICommandPalette],
+  requires: [ICommandPalette, IStateDB],
   optional: [ILauncher, ILayoutRestorer],
   activate: (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
+    stateDB: IStateDB,
     launcher: ILauncher | null,
     restorer: ILayoutRestorer | null
   ) => {
@@ -64,8 +66,27 @@ const plugin: JupyterFrontEndPlugin<void> = {
         name = Date.now().toString();
       }
 
+      // Prefix shared by all state keys for this widget
+      const stateKeyPrefix = `${PLUGIN_ID}:${name}`;
+
+      // Load any initial state before widget creation
+      const initialState = new Map<string, any>();
+      const pluginStateKeys = await stateDB.list(PLUGIN_NAMESPACE);
+
+      pluginStateKeys.ids.forEach((stateKey, index) => {
+        if (stateKey.startsWith(stateKeyPrefix)) {
+          initialState.set(stateKey, pluginStateKeys.values[index]);
+        }
+      });
+
       // Create the JupyterIGVWidget instance
-      const content = new JupyterIGVWidget(version, name);
+      const content = new JupyterIGVWidget(
+        version,
+        name,
+        stateDB,
+        stateKeyPrefix,
+        initialState
+      );
 
       // Define the MainAreaWidget with the JupyterIGVWidget content
       const widget = new MainAreaWidget({ content });
