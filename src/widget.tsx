@@ -35,11 +35,13 @@ export class JupyterIGVWidget extends ReactWidget {
   private _stateKeyPrefix: string;
   private _cache: Map<string, any>;
 
+  // Resize IGV on widget resize
   protected onResize(msg: Widget.ResizeMessage): void {
     super.onResize(msg);
     window.dispatchEvent(new Event('resize'));
   }
 
+  // Trigger widget re-render on show
   protected onAfterShow(msg: Message): void {
     super.onAfterShow(msg);
     setTimeout(() => this.update(), 500);
@@ -85,6 +87,11 @@ export class JupyterIGVWidget extends ReactWidget {
     this._save(stateKey, value);
   };
 
+  // Set the title of the widget
+  setTitle = (title: string): void => {
+    this.title.label = title;
+  };
+
   render(): JSX.Element {
     // Any hidden JupyterIGV instances are disabled until viewing
     // This prevents hidden tabs from initialising IGV with a width and height of 0
@@ -95,6 +102,7 @@ export class JupyterIGVWidget extends ReactWidget {
         s3PresignHandler={this.s3PresignHandler}
         setItem={this.setItem}
         getItem={this.getItem}
+        setTitle={this.setTitle}
       />
     );
   }
