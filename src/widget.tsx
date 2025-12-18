@@ -4,6 +4,8 @@ import { IStateDB } from '@jupyterlab/statedb';
 import { PLUGIN_NAMESPACE } from '.';
 import { requestAPI } from './handler';
 import JupyterIGV from 'jupyter-igv-component';
+import { Widget } from '@lumino/widgets';
+import { Message } from '@lumino/messaging';
 
 export class JupyterIGVWidget extends ReactWidget {
   constructor(
@@ -32,6 +34,16 @@ export class JupyterIGVWidget extends ReactWidget {
   private _stateDB: IStateDB;
   private _stateKeyPrefix: string;
   private _cache: Map<string, any>;
+
+  protected onResize(msg: Widget.ResizeMessage): void {
+    super.onResize(msg);
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  protected onAfterShow(msg: Message): void {
+    super.onAfterShow(msg);
+    setTimeout(() => this.update(), 500);
+  }
 
   // Save value to stateDB
   private _save(stateKey: string, value: any) {
@@ -74,8 +86,11 @@ export class JupyterIGVWidget extends ReactWidget {
   };
 
   render(): JSX.Element {
+    // Any hidden JupyterIGV instances are disabled until viewing
+    // This prevents hidden tabs from initialising IGV with a width and height of 0
     return (
       <JupyterIGV
+        enabled={this.node.clientWidth > 0}
         version={this.version}
         s3PresignHandler={this.s3PresignHandler}
         setItem={this.setItem}
