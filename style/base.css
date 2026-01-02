@@ -4,7 +4,7 @@
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
 
-.igv-widget {
+.jupyter-igv-widget {
   margin: 0;
   padding: 0;
   color: black;

@@ -5,19 +5,25 @@ import {
 } from '@jupyterlab/application';
 import {
   ICommandPalette,
+  IThemeManager,
   MainAreaWidget,
   WidgetTracker
 } from '@jupyterlab/apputils';
-import { IDocumentManager } from '@jupyterlab/docmanager';
+import { IStateDB } from '@jupyterlab/statedb';
 import { ILauncher } from '@jupyterlab/launcher';
-import { requestAPI, requestAPIResponse } from './handler';
-import { IGVWidget } from './widget';
+import { requestAPI } from './handler';
+import { JupyterIGVWidget } from './widget';
 import { igvIcon } from './icon';
 
-export const PLUGIN_NAMESPACE = '@jupyter-igv';
+export const PLUGIN_NAME = 'jupyter-igv';
+export const PLUGIN_NAMESPACE = `@${PLUGIN_NAME}`;
 const PLUGIN_ID = `${PLUGIN_NAMESPACE}:plugin`;
 
-const tracker = new WidgetTracker<MainAreaWidget<IGVWidget>>({
+// Command IDs and categories
+const igvCommandID = 'jupyter_igv';
+const category = 'CLIMB-TRE';
+
+const tracker = new WidgetTracker<MainAreaWidget<JupyterIGVWidget>>({
   namespace: PLUGIN_NAMESPACE
 });
 
@@ -28,20 +34,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: PLUGIN_ID,
   description: 'JupyterLab Extension for IGV (Integrative Genomics Viewer).',
   autoStart: true,
-  requires: [ICommandPalette, IDocumentManager],
+  requires: [ICommandPalette, IStateDB, IThemeManager],
   optional: [ILauncher, ILayoutRestorer],
   activate: (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
-    documentManager: IDocumentManager,
+    stateDB: IStateDB,
+    themeManager: IThemeManager,
     launcher: ILauncher | null,
     restorer: ILayoutRestorer | null
   ) => {
     console.log(`JupyterLab extension ${PLUGIN_NAMESPACE} is activated!`);
-
-    // Define command IDs and categories
-    const igvCommandID = 'jupyter_igv:open';
-    const category = 'CLIMB-TRE';
 
     // Retrieve extension version and log to the console
     let version = '';
@@ -56,36 +59,41 @@ const plugin: JupyterFrontEndPlugin<void> = {
         console.error(`Failed to fetch ${PLUGIN_NAMESPACE} version: ${error}`)
       );
 
-    // Handle layout restoration
-    if (restorer) {
-      void restorer.restore(tracker, {
-        command: igvCommandID,
-        args: widget => ({ name: widget.content.name }),
-        name: widget => widget.content.name
-      });
-    }
-
-    // Function to create new IGV widgets
-    const createIGVWidget = async (
+    // Function to create new JupyterIGV widgets
+    const createJupyterIGVWidget = async (
       name?: string
-    ): Promise<MainAreaWidget<IGVWidget>> => {
+    ): Promise<MainAreaWidget<JupyterIGVWidget>> => {
       // Generate a unique name if not provided
       if (!name) {
         name = Date.now().toString();
       }
 
-      // Create the IGVWidget instance
-      const content = new IGVWidget(
-        route => Promise.resolve(requestAPIResponse(route)),
-        _ => Promise.resolve(),
-        _ => Promise.resolve(),
+      // Prefix shared by all state keys for this widget
+      const stateKeyPrefix = `${PLUGIN_ID}:${name}`;
+
+      // Load any initial state before widget creation
+      const initialState = new Map<string, any>();
+      const pluginStateKeys = await stateDB.list(PLUGIN_NAMESPACE);
+
+      pluginStateKeys.ids.forEach((stateKey, index) => {
+        if (stateKey.startsWith(stateKeyPrefix)) {
+          initialState.set(stateKey, pluginStateKeys.values[index]);
+        }
+      });
+
+      // Create the JupyterIGVWidget instance
+      const content = new JupyterIGVWidget(
+        themeManager,
         version,
-        name
+        name,
+        stateDB,
+        stateKeyPrefix,
+        initialState
       );
 
-      // Define the MainAreaWidget with the IGVWidget content
+      // Define the MainAreaWidget with the JupyterIGVWidget content
       const widget = new MainAreaWidget({ content });
-      widget.id = `igv-widget-${name}`;
+      widget.id = `jupyter-igv-widget-${name}`;
       widget.title.label = 'IGV';
       widget.title.icon = igvIcon;
       widget.title.closable = true;
@@ -96,12 +104,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
     // Add commands to the command registry
     // Command to launch IGV
     app.commands.addCommand(igvCommandID, {
-      caption: 'IGV | Integrative Genomics Viewer',
       label: 'IGV',
+      caption: 'IGV | Integrative Genomics Viewer',
       icon: igvIcon,
       execute: async args => {
         const name = args['name'] as string;
-        let widget: MainAreaWidget<IGVWidget>;
+        let widget: MainAreaWidget<JupyterIGVWidget>;
 
         if (name) {
           // Restore existing widget
@@ -109,11 +117,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
           if (existingWidget) {
             widget = existingWidget;
           } else {
-            widget = await createIGVWidget(name);
+            widget = await createJupyterIGVWidget(name);
           }
         } else {
           // Create new widget
-          widget = await createIGVWidget();
+          widget = await createJupyterIGVWidget();
         }
 
         // Add the widget to the tracker if it's not there
@@ -142,6 +150,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
         category: category
       });
     }
+
+    // Handle layout restoration
+    if (restorer) {
+      void restorer.restore(tracker, {
+        command: igvCommandID,
+        args: widget => ({ name: widget.content.name }),
+        name: widget => widget.content.name
+      });
+    }
+
+    // Update widget theme on change
+    themeManager.themeChanged.connect(theme => {
+      tracker.forEach(w => w.content.updateTheme(theme.theme));
+    });
   }
 };
 
