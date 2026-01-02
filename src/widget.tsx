@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactWidget } from '@jupyterlab/apputils';
+import { IThemeManager, ReactWidget } from '@jupyterlab/apputils';
 import { IStateDB } from '@jupyterlab/statedb';
 import { PLUGIN_NAMESPACE } from '.';
 import { requestAPI } from './handler';
@@ -9,6 +9,7 @@ import { Message } from '@lumino/messaging';
 
 export class JupyterIGVWidget extends ReactWidget {
   constructor(
+    themeManager: IThemeManager,
     version: string,
     name: string,
     stateDB: IStateDB,
@@ -16,6 +17,8 @@ export class JupyterIGVWidget extends ReactWidget {
     initialState?: Map<string, any>
   ) {
     super();
+    this.themeManager = themeManager;
+    this.bsTheme = this.setBSTheme(this.themeManager.theme);
     this.version = version;
     this.name = name;
     this._stateDB = stateDB;
@@ -29,6 +32,8 @@ export class JupyterIGVWidget extends ReactWidget {
     this.disposed.connect(this._cleanup, this);
   }
 
+  themeManager: IThemeManager;
+  bsTheme: string;
   version: string;
   name: string;
   private _stateDB: IStateDB;
@@ -66,6 +71,20 @@ export class JupyterIGVWidget extends ReactWidget {
         });
       }
     });
+  }
+
+  // Set the bootstrap theme from JupyterLab theme
+  setBSTheme(theme: string | null): string {
+    this.bsTheme =
+      theme && !this.themeManager.isLight(theme) ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-bs-theme', this.bsTheme);
+    return this.bsTheme;
+  }
+
+  // Update the bootstrap theme and re-render widget
+  updateTheme(theme: string | null): void {
+    this.setBSTheme(theme);
+    this.update();
   }
 
   // Handler for generating presigned S3 URLs

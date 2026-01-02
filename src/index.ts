@@ -5,6 +5,7 @@ import {
 } from '@jupyterlab/application';
 import {
   ICommandPalette,
+  IThemeManager,
   MainAreaWidget,
   WidgetTracker
 } from '@jupyterlab/apputils';
@@ -33,12 +34,13 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: PLUGIN_ID,
   description: 'JupyterLab Extension for IGV (Integrative Genomics Viewer).',
   autoStart: true,
-  requires: [ICommandPalette, IStateDB],
+  requires: [ICommandPalette, IStateDB, IThemeManager],
   optional: [ILauncher, ILayoutRestorer],
   activate: (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
     stateDB: IStateDB,
+    themeManager: IThemeManager,
     launcher: ILauncher | null,
     restorer: ILayoutRestorer | null
   ) => {
@@ -81,6 +83,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
       // Create the JupyterIGVWidget instance
       const content = new JupyterIGVWidget(
+        themeManager,
         version,
         name,
         stateDB,
@@ -156,6 +159,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
         name: widget => widget.content.name
       });
     }
+
+    // Update widget theme on change
+    themeManager.themeChanged.connect(theme => {
+      tracker.forEach(w => w.content.updateTheme(theme.theme));
+    });
   }
 };
 
