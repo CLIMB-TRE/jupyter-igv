@@ -3767,9 +3767,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jupyter-igv-component@npm:^0.1.5":
-  version: 0.1.5
-  resolution: "jupyter-igv-component@npm:0.1.5"
+"jupyter-igv-component@npm:^0.1.7":
+  version: 0.1.7
+  resolution: "jupyter-igv-component@npm:0.1.7"
   dependencies:
     "@hookform/resolvers": ^5.2.2
     "@tanstack/react-query": ^4.36.1
@@ -3781,7 +3781,7 @@ __metadata:
     climb-jupyter-base-component: ^0.2.1
     react: ^17.0.1 || ^18.2.0
     react-dom: ^17.0.1 || ^18.2.0
-  checksum: b00825987ad7a95ea69a212ee5b102b053589a9091d49538c52c08584c140a76a272bf1c45ff3d6203a042d8b76254e6bae418fa6052bfcba70b73272330c836
+  checksum: a686d37c3690956a200390ab8c38c77160d282d3d6030b2fb2e5a0de9c919fe06b59367daca70058f7b80512456036cc05500fdc55cb85f502ae1b1f93cbe599
   languageName: node
   linkType: hard
 
@@ -3807,7 +3807,7 @@ __metadata:
     eslint: ^8.36.0
     eslint-config-prettier: ^8.8.0
     eslint-plugin-prettier: ^5.0.0
-    jupyter-igv-component: ^0.1.5
+    jupyter-igv-component: ^0.1.7
     mkdirp: ^1.0.3
     npm-run-all: ^4.1.5
     prettier: ^3.0.0
