@@ -1,11 +1,12 @@
 import os
 import json
 import boto3
+from botocore.exceptions import ClientError
 import tornado
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
 from ._version import __version__
-from climb_jupyter_base.exceptions import AuthenticationError
+from climb_jupyter_base.exceptions import AuthenticationError, ValidationError
 from climb_jupyter_base.decorators import handle_api_errors
 from .validators import validate_s3_uri
 
@@ -36,11 +37,17 @@ class S3PresignHandler(APIHandler):
             aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
             endpoint_url=JUPYTERLAB_S3_ENDPOINT,
         )
-        presigned_url = s3.generate_presigned_url(
-            ClientMethod="get_object",
-            Params={"Bucket": bucket_name, "Key": key},
-            ExpiresIn=3600,
-        )
+        try:
+            presigned_url = s3.generate_presigned_url(
+                ClientMethod="get_object",
+                Params={"Bucket": bucket_name, "Key": key},
+                ExpiresIn=3600,
+            )
+        except ClientError as e:
+            self.log.error(e)
+            raise ValidationError(
+                f"Failed to generate presigned URL: {e.response['Error']['Code']}"
+            )
 
         # Return the presigned url
         self.finish(json.dumps({"url": presigned_url}))
