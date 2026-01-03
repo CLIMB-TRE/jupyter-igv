@@ -15,12 +15,12 @@ import { requestAPI } from './handler';
 import { JupyterIGVWidget } from './widget';
 import { igvIcon } from './icon';
 
-export const PLUGIN_NAME = 'jupyter-igv';
+export const PLUGIN_NAME = 'climb-jupyter-igv';
 export const PLUGIN_NAMESPACE = `@${PLUGIN_NAME}`;
 const PLUGIN_ID = `${PLUGIN_NAMESPACE}:plugin`;
 
 // Command IDs and categories
-const igvCommandID = 'jupyter_igv';
+const igvCommandID = 'climb_jupyter_igv';
 const category = 'CLIMB-TRE';
 
 const tracker = new WidgetTracker<MainAreaWidget<JupyterIGVWidget>>({
@@ -28,7 +28,7 @@ const tracker = new WidgetTracker<MainAreaWidget<JupyterIGVWidget>>({
 });
 
 /**
- * Initialization data for the jupyter-igv extension.
+ * Initialization data for the climb-jupyter-igv extension.
  */
 const plugin: JupyterFrontEndPlugin<void> = {
   id: PLUGIN_ID,

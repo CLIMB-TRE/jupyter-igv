@@ -7,7 +7,7 @@ requires = [
 build-backend = "hatchling.build"
 
 [project]
-name = "jupyter-igv"
+name = "climb-jupyter-igv"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
@@ -37,25 +37,25 @@ source = "nodejs"
 fields = ["description", "authors", "urls"]
 
 [tool.hatch.build.targets.sdist]
-artifacts = ["jupyter_igv/labextension"]
+artifacts = ["climb_jupyter_igv/labextension"]
 exclude = [".github", "binder", "images", "docs"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"jupyter_igv/labextension" = "share/jupyter/labextensions/jupyter-igv"
-"install.json" = "share/jupyter/labextensions/jupyter-igv/install.json"
+"climb_jupyter_igv/labextension" = "share/jupyter/labextensions/climb-jupyter-igv"
+"install.json" = "share/jupyter/labextensions/climb-jupyter-igv/install.json"
 "jupyter-config/server-config" = "etc/jupyter/jupyter_server_config.d"
 
 [tool.hatch.build.hooks.version]
-path = "jupyter_igv/_version.py"
+path = "climb_jupyter_igv/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
-    "jupyter_igv/labextension/static/style.js",
-    "jupyter_igv/labextension/package.json",
+    "climb_jupyter_igv/labextension/static/style.js",
+    "climb_jupyter_igv/labextension/package.json",
 ]
-skip-if-exists = ["jupyter_igv/labextension/static/style.js"]
+skip-if-exists = ["climb_jupyter_igv/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 build_cmd = "build:prod"
@@ -65,7 +65,7 @@ npm = ["jlpm"]
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "jupyter_igv/labextension"
+build_dir = "climb_jupyter_igv/labextension"
 
 [tool.jupyter-releaser.options]
 version_cmd = "hatch version"

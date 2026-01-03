@@ -17,7 +17,11 @@ export async function requestAPI<T>(
   // Make request to Jupyter API
   const settings = ServerConnection.makeSettings();
 
-  const requestUrl = URLExt.join(settings.baseUrl, 'jupyter-igv', endPoint);
+  const requestUrl = URLExt.join(
+    settings.baseUrl,
+    'climb-jupyter-igv',
+    endPoint
+  );
 
   const url = new URL(requestUrl);
   if (param[0] !== '') {

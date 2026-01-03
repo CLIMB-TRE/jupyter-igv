@@ -1,6 +1,6 @@
 {
-    "name": "jupyter-igv",
-    "version": "0.2.0",
+    "name": "climb-jupyter-igv",
+    "version": "0.1.0",
     "description": "JupyterLab extension for IGV",
     "keywords": [
         "gui",
@@ -12,9 +12,9 @@
         "jupyterlab",
         "jupyterlab-extension"
     ],
-    "homepage": "https://github.com/tombch/jupyter-igv",
+    "homepage": "https://github.com/CLIMB-TRE/jupyter-igv",
     "bugs": {
-        "url": "https://github.com/tombch/jupyter-igv/issues"
+        "url": "https://github.com/CLIMB-TRE/jupyter-igv/issues"
     },
     "license": "MIT",
     "author": "University of Birmingham",
@@ -34,7 +34,7 @@
     "style": "style/index.css",
     "repository": {
         "type": "git",
-        "url": "https://github.com/tombch/jupyter-igv.git"
+        "url": "https://github.com/CLIMB-TRE/jupyter-igv.git"
     },
     "scripts": {
         "build": "jlpm build:lib && jlpm build:labextension:dev",
@@ -46,7 +46,7 @@
         "clean": "jlpm clean:lib",
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
         "clean:lintcache": "rimraf .eslintcache .stylelintcache",
-        "clean:labextension": "rimraf jupyter_igv/labextension jupyter_igv/_version.py",
+        "clean:labextension": "rimraf climb_jupyter_igv/labextension climb_jupyter_igv/_version.py",
         "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
         "eslint": "jlpm eslint:check --fix",
         "eslint:check": "eslint . --cache --ext .ts,.tsx",
@@ -116,12 +116,12 @@
                     "pip"
                 ],
                 "base": {
-                    "name": "jupyter_igv"
+                    "name": "climb_jupyter_igv"
                 }
             }
         },
         "extension": true,
-        "outputDir": "jupyter_igv/labextension"
+        "outputDir": "climb_jupyter_igv/labextension"
     },
     "eslintIgnore": [
         "node_modules",

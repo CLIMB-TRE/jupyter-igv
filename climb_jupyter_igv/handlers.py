@@ -11,7 +11,7 @@ from climb_jupyter_base.decorators import handle_api_errors
 from .validators import validate_s3_uri
 
 
-PLUGIN_NAME = "jupyter-igv"
+PLUGIN_NAME = "climb-jupyter-igv"
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 JUPYTERLAB_S3_ENDPOINT = os.environ.get("JUPYTERLAB_S3_ENDPOINT")
