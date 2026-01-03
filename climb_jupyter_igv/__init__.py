@@ -5,22 +5,18 @@ except ImportError:
     # in editable mode with pip. It is highly recommended to install
     # the package from a stable release or in editable mode: https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs
     import warnings
-    warnings.warn("Importing 'jupyter_igv' outside a proper installation.")
+
+    warnings.warn("Importing 'climb_jupyter_igv' outside a proper installation.")
     __version__ = "dev"
 from .handlers import setup_handlers
 
 
 def _jupyter_labextension_paths():
-    return [{
-        "src": "labextension",
-        "dest": "jupyter-igv"
-    }]
+    return [{"src": "labextension", "dest": "climb-jupyter-igv"}]
 
 
 def _jupyter_server_extension_points():
-    return [{
-        "module": "jupyter_igv"
-    }]
+    return [{"module": "climb_jupyter_igv"}]
 
 
 def _load_jupyter_server_extension(server_app):
@@ -32,5 +28,5 @@ def _load_jupyter_server_extension(server_app):
         JupyterLab application instance
     """
     setup_handlers(server_app.web_app)
-    name = "jupyter_igv"
+    name = "climb_jupyter_igv"
     server_app.log.info(f"Registered {name} server extension")
